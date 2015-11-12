@@ -1,3 +1,4 @@
+'use strict';
 var path = require('path');
 var gulp = require('gulp');
 var eslint = require('gulp-eslint');
@@ -6,13 +7,7 @@ var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var nsp = require('gulp-nsp');
 var plumber = require('gulp-plumber');
-var babel = require('gulp-babel');
-var del = require('del');
-var isparta = require('isparta');
-
-// Initialize the babel transpiler so ES2015 files gets compiled
-// when they're loaded
-require('babel-core/register');
+var coveralls = require('gulp-coveralls');
 
 gulp.task('static', function () {
   return gulp.src('**/*.js')
@@ -29,8 +24,7 @@ gulp.task('nsp', function (cb) {
 gulp.task('pre-test', function () {
   return gulp.src('lib/**/*.js')
     .pipe(istanbul({
-      includeUntested: true,
-      instrumenter: isparta.Instrumenter
+      includeUntested: true
     }))
     .pipe(istanbul.hookRequire());
 });
@@ -50,15 +44,14 @@ gulp.task('test', ['pre-test'], function (cb) {
     });
 });
 
-gulp.task('babel', ['clean'], function () {
-  return gulp.src('lib/**/*.js')
-    .pipe(babel())
-    .pipe(gulp.dest('dist'));
+gulp.task('coveralls', ['test'], function () {
+  if (!process.env.CI) {
+    return;
+  }
+
+  return gulp.src(path.join(__dirname, 'coverage/lcov.info'))
+    .pipe(coveralls());
 });
 
-gulp.task('clean', function () {
-  return del('dist');
-});
-
-gulp.task('prepublish', ['nsp', 'babel']);
-gulp.task('default', ['static', 'test']);
+gulp.task('prepublish', ['nsp']);
+gulp.task('default', ['static', 'test', 'coveralls']);

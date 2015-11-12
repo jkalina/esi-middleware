@@ -9,27 +9,30 @@
     "url": ""
   },
   "files": [
-    "dist"
+    "lib"
   ],
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "keywords": [],
-  "repository": "jkalina/esi-middleware",
+  "repository": "git@github.com:jkalina/esi-middleware.git",
   "devDependencies": {
+    "data-driven": "^1.2.1",
     "gulp": "^3.6.0",
+    "gulp-coveralls": "^0.1.0",
     "gulp-eslint": "^1.0.0",
     "gulp-exclude-gitignore": "^1.0.0",
     "gulp-istanbul": "^0.9.0",
     "gulp-mocha": "^2.0.0",
-    "gulp-plumber": "^1.0.0",
     "gulp-nsp": "^2.1.0",
-    "gulp-babel": "^5.1.0",
-    "del": "^2.0.2",
-    "babel-core": "^5.5.0",
-    "isparta": "^3.0.3"
+    "gulp-plumber": "^1.0.0",
+    "nock": "^2.17.0"
   },
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "url": "^0.11.0",
+    "winston": "^2.1.0"
+  }
 }

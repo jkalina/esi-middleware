@@ -1,4 +1,4 @@
-# esi-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# esi-middleware [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
 > ESI tag resolver
 
 ## Installation
@@ -25,3 +25,5 @@ Apache-2.0 © [Jakub Kalina]()
 [travis-url]: https://travis-ci.org/jkalina/esi-middleware
 [daviddm-image]: https://david-dm.org/jkalina/esi-middleware.svg?theme=shields.io
 [daviddm-url]: https://david-dm.org/jkalina/esi-middleware
+[coveralls-image]: https://coveralls.io/repos/jkalina/esi-middleware/badge.svg
+[coveralls-url]: https://coveralls.io/r/jkalina/esi-middleware
