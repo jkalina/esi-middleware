@@ -144,7 +144,7 @@ describe('esi-middleware', function () {
 
   context('#_fetchEsi()', function () {
 
-    it('should fetch http content from a given absolute uri', function (done) {
+    it('should fetch http content from a path given in options', function (done) {
 
       //given:
       var esi = new Esi();
@@ -165,27 +165,6 @@ describe('esi-middleware', function () {
       });
 
     });
-
-    // it('should fetch http content from a given relative uri', function (done) {
-    //
-    //   //given:
-    //   var esi = new Esi();
-    //
-    //   //when:
-    //   esi._fetchEsi('/test',
-    //
-    //     function (src, status, body) {
-    //
-    //       assert.equal(src, '/test');
-    //       assert.equal(status, 200);
-    //       assert.equal(body, 'Hello');
-    //       done();
-    //
-    //     }
-    //
-    //   );
-    //
-    // });
 
     // //FIXME
     // it('should return error message on any http error', function (done) {
@@ -502,6 +481,31 @@ describe('esi-middleware', function () {
         });
 
       });
+
+  });
+
+  context('#_substitute()', function () {
+
+    it('should substitute all esi tags according to the given subsitution array', function () {
+
+      //given:
+      var esi = new Esi();
+      var contentWithTwoEsiTags =
+        '<html><body><esi:include src="http://first.address" /><esi:include src="http://second.address" /><esi:include src="http://second.address" /></body></html>';
+
+      var subsitutionArray = [];
+          subsitutionArray['http://first.address'] = '<h1>hello test</h1>';
+          subsitutionArray['http://second.address'] = '<h2>esi ftw!</h2>';
+
+      //when:
+      var result = esi._substitute(contentWithTwoEsiTags, subsitutionArray);
+
+      //then:
+      var expectedResult = '<html><body><h1>hello test</h1><h2>esi ftw!</h2><h2>esi ftw!</h2></body></html>';
+
+      assert.equal(result, expectedResult);
+
+    });
 
   });
 
