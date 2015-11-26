@@ -507,6 +507,25 @@ describe('esi-middleware', function () {
 
     });
 
+    it('should substitute only known esi tags according to the given subsitution array', function () {
+
+      //given:
+      var esi = new Esi();
+      var contentWithTwoEsiTags =
+        '<html><body><esi:include src="http://first.address" /><esi:include src="http://second.address" /></body></html>';
+
+      var subsitutionArray = [];
+          subsitutionArray['http://first.address'] = '<h1>hello test</h1>';
+
+      //when:
+      var result = esi._substitute(contentWithTwoEsiTags, subsitutionArray);
+
+      //then:
+      var expectedResult = '<html><body><h1>hello test</h1><esi:include src="http://second.address" /></body></html>';
+
+      assert.equal(result, expectedResult);
+
+    });
   });
 
 });

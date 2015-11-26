@@ -24,7 +24,9 @@
     "gulp-mocha": "^2.0.0",
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.0.0",
-    "nock": "^2.17.0"
+    "nock": "^2.17.0",
+    "q": "^1.4.1",
+    "q-io": "^1.13.1"
   },
   "scripts": {
     "prepublish": "gulp prepublish",
