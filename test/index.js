@@ -15,76 +15,102 @@ nock('http://esi.com:80')
 var Esi = require('../lib').Esi;
 
 describe('esi-middleware', function () {
-  context('#_isReqEsiCapable()', function (){
-    dataDriven(
-      [
-        {
-          headers: {
-            'surrogate-capability': 'ESI/1.0'
-          }
-        },
-        {
-          headers: {
-            'surrogate-capabilities': 'ESI/1.0'
-          }
-        },
-        {
-          headers: {
-            'accept-esi': true
-          }
-        }
-      ],
-      function () {
-        it('should return true when the header contains proper entry', function (ctx) {
+  // context('#process()', function (){
+  //   it('should not process tags if response content type is not text based', function () {
+  //
+  //     //given:
+  //     var esi = new Esi({
+  //       esi: true
+  //     });
+  //
+  //     //when:
+  //     esi.process(req, res, next)
+  //
+  //   });
+  // });
 
-          //given:
-          var esi = new Esi();
-
-          //when:
-          var result = esi._isReqEsiCapable(ctx.headers);
-
-          //then:
-          assert.equal(result, true);
-
-        });
-      }
-    );
-
-    it('should return false when the header doesn\'t contain proper entry', function () {
-
-      //given:
-      var esi = new Esi();
-
-      //when:
-      var result = esi._isReqEsiCapable({});
-
-      //then:
-      assert.equal(result, false);
-
-    });
-  });
+  // context('#_isReqEsiCapable()', function (){
+  //   dataDriven(
+  //     [
+  //       {
+  //         headers: {
+  //           'surrogate-capability': 'ESI/1.0'
+  //         }
+  //       },
+  //       {
+  //         headers: {
+  //           'surrogate-capabilities': 'ESI/1.0'
+  //         }
+  //       },
+  //       {
+  //         headers: {
+  //           'accept-esi': true
+  //         }
+  //       }
+  //     ],
+  //     function () {
+  //       it('should return true when the header contains proper entry', function (ctx) {
+  //
+  //         //given:
+  //         var esi = new Esi();
+  //
+  //         //when:
+  //         var result = esi._isReqEsiCapable(ctx.headers);
+  //
+  //         //then:
+  //         assert.equal(result, true);
+  //
+  //       });
+  //     }
+  //   );
+  //
+  //   it('should return false when the header doesn\'t contain proper entry', function () {
+  //
+  //     //given:
+  //     var esi = new Esi();
+  //
+  //     //when:
+  //     var result = esi._isReqEsiCapable({});
+  //
+  //     //then:
+  //     assert.equal(result, false);
+  //
+  //   });
+  // });
 
   context('#_isResText()', function () {
     dataDriven(
       [
         {
-          contentType: 'text'
+          res: {
+            _headers: {
+                'content-type': 'text'
+            }
+          }
         },
         {
-          contentType: 'xml'
+          res: {
+            _headers: {
+              'content-type': 'xml'
+            }
+          }
         },
         {
-          contentType: 'octet-stream'
+          res: {
+            _headers: {
+              'content-type': 'octet-stream'
+            }
+          }
         }
       ],
       function () {
-        it('should return true when the content type is set to {contentType}', function (ctx) {
+        it('should return true when the content type is text based', function (ctx) {
 
           //given:
           var esi = new Esi();
 
           //when:
-          var result = esi._isResText(ctx.contentType);
+          var result = esi._isResText(ctx.res);
 
           //then:
           assert.equal(result, true);
@@ -99,7 +125,11 @@ describe('esi-middleware', function () {
       var esi = new Esi();
 
       //when:
-      var result = esi._isResText('image/png');
+      var result = esi._isResText({
+        _headers: {
+          'content-type': 'image/png'
+        }
+      });
 
       //then:
       assert.equal(result, false);
@@ -108,87 +138,65 @@ describe('esi-middleware', function () {
 
   });
 
-  context('#_getResContentType()', function () {
+  // context('#_getResContentType()', function () {
+  //
+  //   it('should return content type value if found in headers object', function () {
+  //
+  //     //given:
+  //     var esi = new Esi();
+  //     var headers = {
+  //       'content-type' : 'image/jpeg'
+  //     }
+  //
+  //     //when:
+  //     var result = esi._getResContentType(headers);
+  //
+  //     //then:
+  //     assert.equal(result, 'image/jpeg');
+  //
+  //   });
+  //
+  //   it('should return text/plain as a default content type value if not found in headers object', function () {
+  //
+  //     //given:
+  //     var esi = new Esi();
+  //     var headers = {}
+  //
+  //     //when:
+  //     var result = esi._getResContentType(headers);
+  //
+  //     //then:
+  //     assert.equal(result, 'text/plain');
+  //
+  //   });
+  //
+  // });
 
-    it('should return content type value if found in headers object', function () {
-
-      //given:
-      var esi = new Esi();
-      var headers = {
-        'content-type' : 'image/jpeg'
-      }
-
-      //when:
-      var result = esi._getResContentType(headers);
-
-      //then:
-      assert.equal(result, 'image/jpeg');
-
-    });
-
-    it('should return text/plain as a default content type value if not found in headers object', function () {
-
-      //given:
-      var esi = new Esi();
-      var headers = {}
-
-      //when:
-      var result = esi._getResContentType(headers);
-
-      //then:
-      assert.equal(result, 'text/plain');
-
-    });
-
-  });
-
-  context('#_fetchEsi()', function () {
-
-    it('should fetch http content from a path given in options', function (done) {
-
-      //given:
-      var esi = new Esi();
-      var options = {
-        host: 'esi.com',
-        port: 80,
-        path: '/test',
-        src: 'http://esi.com/test'
-      };
-
-      //when:
-      esi._fetchEsi(options, function (opts, status, body) {
-
-          //then:
-          assert.equal(status, 200);
-          assert.equal(body, 'Hello');
-          done();
-      });
-
-    });
-
-    // //FIXME
-    // it('should return error message on any http error', function (done) {
-    //
-    //   //given:
-    //   var esi = new Esi();
-    //
-    //   //when:
-    //   esi._fetchEsi('http://esi.com/error',
-    //
-    //     function (src, status, body) {
-    //
-    //       assert.equal('http://esi.com/error', src);
-    //       assert.equal(500, status);
-    //       assert.equal('Hello', body);
-    //       done();
-    //
-    //     }
-    //
-    //   );
-    //
-    // });
-
-  });
+  // context('#_fetchEsi()', function () {
+  //
+  //   it('should fetch http content from a path given in options', function (done) {
+  //
+  //     //given:
+  //     var esi = new Esi();
+  //     var options = {
+  //       host: 'esi.com',
+  //       port: 80,
+  //       path: '/test',
+  //       src: 'http://esi.com/test'
+  //     };
+  //
+  //     //when:
+  //     esi._fetchEsi(options, function (opts, status, body) {
+  //
+  //         //then:
+  //         assert.equal(status, 200);
+  //         assert.equal(body, 'Hello');
+  //         done();
+  //     });
+  //
+  //   });
+  //
+  // });
 
   context('#_checkIfShouldHandleEsi()', function () {
 
@@ -333,31 +341,7 @@ describe('esi-middleware', function () {
     });
   });
 
-  // context('#process()', function () {
-  //
-  //   it('test', function () {
-  //
-  //     //given:
-  //     var esi = new Esi({
-  //       esi: true
-  //     });
-  //
-  //     var res = {
-  //       write: function (chunk, encoding) {
-  //
-  //       }
-  //     };
-  //
-  //     //when:
-  //     var result = esi.process();
-  //
-  //     //then:
-  //     // assert.equal('string', typeof result);
-  //
-  //   });
-  // });
-
-  context('#_searchEsi()', function () {
+  context('#_searchForTags()', function () {
 
     it('should match esi tags in given source and return an array containing unique values', function () {
 
@@ -368,119 +352,13 @@ describe('esi-middleware', function () {
       + '<esi:include src="/fnd/_fragment?_path=_controller%3DAllegroVelaLayoutBundle%253ADefault%253Acss" />';
 
       //when:
-      var result = esi._searchEsi(contentWithEsiTags);
+      var result = esi._searchForTags(contentWithEsiTags);
 
       //then:
       assert.equal(result.length, 1);
       assert.equal(result[0], '/fnd/_fragment?_path=_controller%3DAllegroVelaLayoutBundle%253ADefault%253Acss');
 
     });
-
-  });
-
-  // context('#_processEsi()', function () {
-  //
-  //   it('shou', function () {
-  //
-  //     //given:
-  //     var esi = new Esi();
-  //     var contentWithEsiTags =
-  //       '<esi:include src="/fnd/_fragment?_path=_controller%3DAllegroVelaLayoutBundle%253ADefault%253Acss" />'
-  //     + '<esi:include src="/fnd/_fragment?_path=_controller%3DAllegroVelaLayoutBundle%253ADefault%253Acss" />';
-  //
-  //     //when:
-  //     var result = esi._processEsi(contentWithEsiTags, function() {
-  //
-  //     });
-  //
-  //   });
-  //
-  // });
-
-  context('#_prepareUri()', function () {
-    dataDriven(
-      [
-        {
-          path: 'http://sample.path.com/test',
-          headers: {},
-          result: {
-            host: 'sample.path.com',
-            port: 80,
-            path: '/test',
-            src: 'http://sample.path.com/test'
-          }
-        },
-        {
-          path: 'http://sample.path.com/test',
-          headers: {},
-          result: {
-            host: 'sample.path.com',
-            port: 80,
-            path: '/test',
-            src: 'http://sample.path.com/test'
-          }
-        },
-        {
-          path: 'http://sample.path.com:666/test',
-          headers: {},
-          result: {
-            host: 'sample.path.com',
-            port: 666,
-            path: '/test',
-            src: 'http://sample.path.com:666/test'
-          }
-        },
-        {
-          path: 'http://sample.path.com',
-          headers: {},
-          result: {
-            host: 'sample.path.com',
-            port: 80,
-            path: '/',
-            src: 'http://sample.path.com'
-          }
-        },
-        {
-          path: '/test',
-          headers: {
-            host: 'host.from.headers'
-          },
-          result: {
-            host: 'host.from.headers',
-            port: 80,
-            path: '/test',
-            src: '/test'
-          }
-        },
-        {
-          path: '/test',
-          headers: {
-            host: 'host.from.headers:3000'
-          },
-          result: {
-            host: 'host.from.headers',
-            port: 3000,
-            path: '/test',
-            src: '/test'
-          }
-        }
-      ],
-      function () {
-
-        it('should return connection options based on path = {path}', function (ctx) {
-
-          //given:
-          var esi = new Esi();
-
-          //when:
-          var result = esi._prepareUri(ctx.path, ctx.headers);
-
-          //then:
-          assert.deepEqual(result, ctx.result);
-
-        });
-
-      });
 
   });
 
